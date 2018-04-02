@@ -1,9 +1,6 @@
 # Python API for [dynamon.io](https://dynamon.io)
 
 
-Caches requests.
-
-
 ## Installing
 
 ```
@@ -13,12 +10,11 @@ pip install dynamon
 
 ## Using
 
-See `test.py` in this repo.
+See [`test.py`](test.py) for an example.
 
-Visit [nodemon.io/my-random-id](https://nodemon.io/my-random-id)
 
-```py
-import dynamon
+## Technical details
 
-dynamon('my-random-id', 'line', [['x', 'y'], [0, 0], [1, 1], [2, 0]])
-```
+This API caches `dynamon.push(..)` requests for `dynamon.cache_timeout` seconds
+(defaulting to 1). After this time a batched http request is made with all
+cached data. This is good for performance.

@@ -1,18 +1,24 @@
-import random
 import threading
+import random
 import time
 import datetime
 import requests
 import dynamon
 import copy
 
+
 class _Dynamon():
     def __init__(self):
         self.first_run = True
         self.cache = {}  # One list [{x, y}] per id ''
         self.push_is_scheduled = False
+        self.path_was_generated = False
 
     def push(self, *args, id='1'):
+        self.ensure_path()
+        self.print_info()
+
+        # Parse args and update cache
         x, y = self.parse_args(*args)
         self.update_cache(x, y, id)
 
@@ -20,6 +26,28 @@ class _Dynamon():
         if not self.push_is_scheduled:
             self.push_is_scheduled = True
             threading.Thread(target=self.push_cache).start()
+
+    def clear(self):
+        self.ensure_path()
+        self.print_info()
+        self.cache = {}
+        threading.Thread(target=self.clear_request).start()
+
+    def clear_request(self):
+        url = 'https://dynamon.io/' + dynamon.path
+        requests.delete(url)
+
+    def ensure_path(self):
+        if not dynamon.path:
+            dynamon.path = self.generate_random_path()
+            self.path_was_generated = True
+
+    def print_info(self):
+        if self.first_run:
+            print('Dynamon: Output at https://dynamon.io/' + dynamon.path)
+            if self.path_was_generated:
+                print('Set path manually by: dynamon.path = \'my-unique-path\'')
+            self.first_run = False
 
     def parse_args(self, *args):
         if len(args) == 0:
@@ -44,29 +72,24 @@ class _Dynamon():
 
         for i, yi in enumerate(y):
             if len(self.cache[id]) < i + 1:
-                print('appending')
                 self.cache[id].append([])
             self.cache[id][i].append({'x': x, 'y': yi})
-        print(self.cache)
 
     def push_cache(self):
-        # During this time self.cache will build up.
+        # During this time self.cache will build up by calls to self.push.
         time.sleep(dynamon.cache_timeout)
+
+        # Abort if cache has been emptied.
+        if not self.cache: return
 
         # Empty the queue and keep a local copy because
         # the http request will take a while to finalize.
-        self.push_is_scheduled = False
         queue = copy.deepcopy(self.cache)
         self.cache = {}
 
-        if not dynamon.path:
-            dynamon.path = self.gen_random_path()
+        self.push_is_scheduled = False
 
         url = 'https://dynamon.io/' + dynamon.path
-
-        if self.first_run:
-            print('Dynamon: ' + url)
-            self.first_run = False
 
         requests.post(url, json=queue)
 
@@ -78,13 +101,15 @@ class _Dynamon():
         try:
             iter(obj)
             return True
-        except Exception:
+        except:
             return False
 
-    def gen_random_path(self):
+    def generate_random_path(self):
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
         return ''.join(random.choice(chars) for _ in range(8))
 
 
-# Expose only the push method
-push = _Dynamon().push
+# Expose no more than needed
+_dynamon = _Dynamon()
+push = _dynamon.push
+clear = _dynamon.clear

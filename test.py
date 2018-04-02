@@ -1,9 +1,13 @@
 from time import sleep
-from math import sin
+from math import sin, cos
 import dynamon
 
+# See output at https://dynamon.io/test
 dynamon.path = 'test'
 
+dynamon.clear()
+
 for i in range(50):
-    dynamon.push(sin(i/2))
+    theta = i/2
+    dynamon.push(i, [sin(theta), cos(theta)])
     sleep(0.2)
