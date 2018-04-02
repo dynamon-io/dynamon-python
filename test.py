@@ -1,44 +1,9 @@
-import dynamon
 from time import sleep
+from math import sin
+import dynamon
 
-dynamon.path = 'wat'
+dynamon.path = 'test'
 
-dynamon.push(1, 1)
-sleep(0.5)
-dynamon.push(2, 2)
-sleep(0.5)
-dynamon.push(3, 3)
-sleep(0.5)
-dynamon.push(4, 2)
-sleep(0.5)
-dynamon.push(5, 1)
-sleep(0.5)
-dynamon.push(6, 2)
-sleep(0.5)
-dynamon.push(7, 3)
-sleep(0.5)
-dynamon.push(8, 2)
-sleep(0.5)
-dynamon.push(9, 1)
-sleep(0.5)
-dynamon.push(10, 2)
-sleep(0.5)
-dynamon.push(11, 3)
-sleep(0.5)
-dynamon.push(12, 2)
-sleep(0.5)
-dynamon.push(13, 1)
-sleep(0.5)
-dynamon.push(14, 2)
-sleep(0.5)
-dynamon.push(15, 3)
-sleep(0.5)
-dynamon.push(16, 2)
-sleep(0.5)
-dynamon.push(17, 1)
-sleep(0.5)
-dynamon.push(18, 2)
-sleep(0.5)
-dynamon.push(19, 3)
-sleep(0.5)
-dynamon.push(20, 2)
+for i in range(50):
+    dynamon.push(sin(i/2))
+    sleep(0.2)
