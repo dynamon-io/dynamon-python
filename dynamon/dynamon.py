@@ -46,7 +46,7 @@ class _Dynamon():
         if self.first_run:
             print('Dynamon: Output at https://dynamon.io/' + dynamon.path)
             if self.path_was_generated:
-                print('Set path manually by: dynamon.path = \'my-unique-path\'')
+                print('Set path manually: dynamon.path = \'my-unique-path\'')
             self.first_run = False
 
     def parse_args(self, *args):
